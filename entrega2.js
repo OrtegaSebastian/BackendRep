@@ -1,44 +1,47 @@
 const fs = require ('fs')
 
-class contenedor {
-    constructor(archivo) {
-    this.archivo = archivo;
+class container {
+    constructor(file) {
+    this.file = file;
     }
-    //*  crear producto
-    async createProduct(objProduct) {
-    const data = await fs.promises.readFile(
-    `${this.archivo}/productos.json`,
+    // save(Object): Number - Recibe un objeto, lo guarda en el file, devuelve el id asignado.
+    async save(objProduct) {
+    const data = await fs.promises.readFile(`${this.file}/products.txt`,
     "utf-8"
     );
-    const productos = JSON.parse(data);
-    const id = productos.length + 1;
+    const products = JSON.parse(data);
+    const id = products.length + 1;
+    
+    objProduct.id = id;    ;
+    objProduct.title = title;
+    objProduct.price = price;
+    objProduct.thumbnail = thumbnail;
 
-    objProduct.id = id;
+    products.push(objProduct);
+    const productsString = JSON.stringify(objProduct);
+    await fs.promises.writeFile(`${this.file}/products.txt`,productsString);
 
-    objProduct.likes = [];
-    productos.push(objProduct);
-    const productosString = JSON.stringify(objProduct);
-    await fs.promises.writeFile(`${this.archivo}/productos.json`,productosString);
-
-    return productos;
+    return products;
     }
+    // getById(Number): Object - Recibe un id y devuelve el objeto con ese id, o null si no está.
     async getProdById(id) {
         const data = await fs.promises.readFile(
-        `${this.archivo}/productos.json`,
+        `${this.file}/products.json`,
         "utf-8"
     );
-    const productos = JSON.parse(data);
-    const producto = productos.find((producto) => producto.id == id);
-    if (producto) {
-        return producto;
+    const products = JSON.parse(data);
+    const product = products.find((product) => product.id == id);
+    if (product) {
+        return product;
     } else {
-        return "producto no encontrado";
+        return "products no encontrado";
     }
     }
-    async getAllUsers() {
+    // getAll(): Object[] - Devuelve un array con los objetos presentes en el file.
+    async getAllProducts() {
         try {
         const data = await fs.promises.readFile(
-        `${this.archivo}/productos.json`,
+        `${this.file}/products.txt`,
         "utf-8"
         );
         return JSON.parse(data);
@@ -46,25 +49,46 @@ class contenedor {
         return [];
     }
     }
-    // deleteById(Number): void - Elimina del archivo el objeto con el id buscado.
-    // deleteAll(): void - Elimina todos los objetos presentes en el archivo.
-}  
+    // deleteAll(): void - Elimina todos los objetos presentes en el file.
+    async deleteAll(){  
+        try {
+            const data = await fs.promises.readFile(
+            `${this.file}/products.txt`,
+            "utf-8"
+            )
+            fs.unlink(`${this.file}/products.txt`, 'utf-8' );
+            console.log("the file has been erased")
+        } catch (error) {
+            return [];
+        }
+    }
+  // deleteById(Number): void - Elimina del file el objeto con el id buscado
+    async deleteById(){
+        //spliceby id
+        try {
+            const data = await fs.promises.readFile(
+            `${this.file}/products.txt`,
+            "utf-8"
+            )
+            fs.unlink(`${this.file}/products.txt`, 'utf-8' );
+        } catch (error) {
+            return [];
+        }
+    }
+
+}
+
+async function start() {
+    const db = new container ("data");
+    db.save({title: "prod1", price: 100, thumbnail: "www.nada1.com" })
+    db.save({title: "prod2", price: 200, thumbnail: "www.nada2.com" }) 
+    db.save({title: "prod3", price: 300, thumbnail: "www.nada3.com" })     
+}
+
+start(); 
 
 
-// save(Object): Number - Recibe un objeto, lo guarda en el archivo, devuelve el id asignado.
-// getById(Number): Object - Recibe un id y devuelve el objeto con ese id, o null si no está.
-// getAll(): Object[] - Devuelve un array con los objetos presentes en el archivo.
-// deleteById(Number): void - Elimina del archivo el objeto con el id buscado.
-// deleteAll(): void - Elimina todos los objetos presentes en el archivo.
 
 
-
-
-// Podemos listar algunas de ellas:
-// readFile: lectura de un archivo en forma asincrónica
-// writeFile: escritura de un archivo en forma asincrónica
-// appendFile: actualización de un archivo en forma asincrónica
-// unlink: borrado de un archivo en forma asincrónica
-// mkdir: creación de una carpeta
 
 
